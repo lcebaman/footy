@@ -147,29 +147,68 @@ export function computeKnockoutProgression(
   
   // Step 1: Resolve R16 qualifiers from group stages
   const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const qualifiers: Record<string, string[]> = {};
-  
+  const qualifiers: Record<string, { winner: string; runnerUp: string }> = {};
+
   groups.forEach(group => {
-    const standings = isPredicted 
+    const standings = isPredicted
       ? computeGroupStandingsFromPredictions(matches, predictions, group, userId)
       : computeGroupStandings(matches, group);
-    
-    qualifiers[group] = standings.slice(0, 2).map(s => s.team);
+
+    const [first, second] = standings.slice(0, 2).map(s => s.team);
+    qualifiers[group] = {
+      winner: first || `Winner ${group}`,
+      runnerUp: second || `Runner-up ${group}`
+    };
   });
 
-  // Update R16 matches with qualifiers
+  // Update R16 matches with qualifiers following the bracket structure:
+  // R16-1: Winner A vs Runner-up B
+  // R16-2: Winner C vs Runner-up D
+  // R16-3: Winner E vs Runner-up F
+  // R16-4: Winner G vs Runner-up H
+  // R16-5: Runner-up A vs Winner B
+  // R16-6: Runner-up C vs Winner D
+  // R16-7: Runner-up E vs Winner F
+  // R16-8: Runner-up G vs Winner H
   processedMatches.forEach(match => {
     if (match.stage === 'R16') {
       let homeTeam = match.home_team;
       let awayTeam = match.away_team;
 
-      // Replace TBD placeholders with actual qualifiers
-      Object.entries(qualifiers).forEach(([group, [first, second]]) => {
-        homeTeam = homeTeam.replace(`TBD ${group}1`, first);
-        awayTeam = awayTeam.replace(`TBD ${group}1`, first);
-        homeTeam = homeTeam.replace(`TBD ${group}2`, second);
-        awayTeam = awayTeam.replace(`TBD ${group}2`, second);
-      });
+      // Replace placeholders with actual team names
+      homeTeam = homeTeam.replace('Winner A', qualifiers['A']?.winner || 'Winner A');
+      homeTeam = homeTeam.replace('Winner B', qualifiers['B']?.winner || 'Winner B');
+      homeTeam = homeTeam.replace('Winner C', qualifiers['C']?.winner || 'Winner C');
+      homeTeam = homeTeam.replace('Winner D', qualifiers['D']?.winner || 'Winner D');
+      homeTeam = homeTeam.replace('Winner E', qualifiers['E']?.winner || 'Winner E');
+      homeTeam = homeTeam.replace('Winner F', qualifiers['F']?.winner || 'Winner F');
+      homeTeam = homeTeam.replace('Winner G', qualifiers['G']?.winner || 'Winner G');
+      homeTeam = homeTeam.replace('Winner H', qualifiers['H']?.winner || 'Winner H');
+      homeTeam = homeTeam.replace('Runner-up A', qualifiers['A']?.runnerUp || 'Runner-up A');
+      homeTeam = homeTeam.replace('Runner-up B', qualifiers['B']?.runnerUp || 'Runner-up B');
+      homeTeam = homeTeam.replace('Runner-up C', qualifiers['C']?.runnerUp || 'Runner-up C');
+      homeTeam = homeTeam.replace('Runner-up D', qualifiers['D']?.runnerUp || 'Runner-up D');
+      homeTeam = homeTeam.replace('Runner-up E', qualifiers['E']?.runnerUp || 'Runner-up E');
+      homeTeam = homeTeam.replace('Runner-up F', qualifiers['F']?.runnerUp || 'Runner-up F');
+      homeTeam = homeTeam.replace('Runner-up G', qualifiers['G']?.runnerUp || 'Runner-up G');
+      homeTeam = homeTeam.replace('Runner-up H', qualifiers['H']?.runnerUp || 'Runner-up H');
+
+      awayTeam = awayTeam.replace('Winner A', qualifiers['A']?.winner || 'Winner A');
+      awayTeam = awayTeam.replace('Winner B', qualifiers['B']?.winner || 'Winner B');
+      awayTeam = awayTeam.replace('Winner C', qualifiers['C']?.winner || 'Winner C');
+      awayTeam = awayTeam.replace('Winner D', qualifiers['D']?.winner || 'Winner D');
+      awayTeam = awayTeam.replace('Winner E', qualifiers['E']?.winner || 'Winner E');
+      awayTeam = awayTeam.replace('Winner F', qualifiers['F']?.winner || 'Winner F');
+      awayTeam = awayTeam.replace('Winner G', qualifiers['G']?.winner || 'Winner G');
+      awayTeam = awayTeam.replace('Winner H', qualifiers['H']?.winner || 'Winner H');
+      awayTeam = awayTeam.replace('Runner-up A', qualifiers['A']?.runnerUp || 'Runner-up A');
+      awayTeam = awayTeam.replace('Runner-up B', qualifiers['B']?.runnerUp || 'Runner-up B');
+      awayTeam = awayTeam.replace('Runner-up C', qualifiers['C']?.runnerUp || 'Runner-up C');
+      awayTeam = awayTeam.replace('Runner-up D', qualifiers['D']?.runnerUp || 'Runner-up D');
+      awayTeam = awayTeam.replace('Runner-up E', qualifiers['E']?.runnerUp || 'Runner-up E');
+      awayTeam = awayTeam.replace('Runner-up F', qualifiers['F']?.runnerUp || 'Runner-up F');
+      awayTeam = awayTeam.replace('Runner-up G', qualifiers['G']?.runnerUp || 'Runner-up G');
+      awayTeam = awayTeam.replace('Runner-up H', qualifiers['H']?.runnerUp || 'Runner-up H');
 
       match.home_team = homeTeam;
       match.away_team = awayTeam;
